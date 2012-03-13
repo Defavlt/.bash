@@ -1,0 +1,120 @@
+#\---------------
+# Functions
+#/---------------
+
+# Clear the screen with some information
+function :clear {
+
+	clear;
+	printf "\n+--------------------------------+\n| ";
+	pwd;
+	printf " : ";
+	date;
+	printf "+--------------------------------+\n\n";
+
+	EXPECTED_ARGS=2
+	if [ $# -lt $EXPECTED_ARGS ];
+	then
+		ls -la --color=always;
+	else
+		case "$2" in
+			-h | --help)
+				printf "Usage: $1 [options] [URL] \nURL: The target path to show info on\nOptions:\n
+\t t,   travelto\t\tSame as -t.
+\t-t, --traverse\t\tNavigate to the specified folder.
+\t-h, --help\t\tDisplay this information.
+\t-n, --empty\t\tDisplays nothing but current directory.
+\t-c, --clear-display\tDisplay just some information (will not work if 'dir' is not available).\n
+
+";
+				;;
+			-q | --qoute)
+				cls;
+				printf "\n";
+				fortune;
+				printf "\n";
+				;;
+			-n | --empy)
+				printf "\n";
+				;;
+			-c | --clear-display)
+				dir;
+				printf "\n";
+				;;
+			s | -s | --show-dir)
+				if [ -z "$3" ];
+				then
+					ls -la --color=always;
+				else
+					ls -la $3 --color=always;
+				fi
+				;;
+			u | -u | --up | travelup)
+				if [ -z "$3" ];
+				then
+					cd ..;
+					:clear $1 -s;
+				else
+					for (( i=0; i<$3; i++ ))
+	 				 do
+						cd ..;
+					 done
+
+					:clear $1 -s;
+				fi
+				;;
+			*)
+				if [ -z "$2" ];
+				then
+					:clear $1 -s;
+				else
+					cd $2;
+					:clear $1 -s;
+				fi
+				;;
+		esac
+	fi
+
+}
+
+# Update this source file with the most recent at github
+# Not yet done. Do not use yet.
+function :update {
+
+	if [ $# -lt 1 ];
+	then
+		cd ~/.bash
+		rm -f *.*
+		git init
+		git remote add bash git@github.com:Defavlt/.bash.git
+		git fetch bash master
+		ln -s ~/.bash/.bashrc ~/.bashrc;
+
+}
+
+function wiki () {
+	if [ $# -gt 0 ];
+	then
+		dig +short txt $1.wp.dg.cx
+	else
+		printf "\nUsage: wiki SUBJECT\n";
+	fi
+}
+
+
+#\---------------
+# Shortcuts
+#/---------------
+
+alias ls='ls -la --color=always'
+alias cls=':clear cls'
+alias ww='cls /var/www'
+
+alias marcus='sudo chown marcus'
+
+alias charc='vi ~/.bashrc'
+alias sourc='source ~/.bashrc'
+
+#Fix some colours! \o/ 
+## (and :;!)
+export PS1="\[\033[01;33m\]\u@\\h:\[\033[01;34m\]\w\$\[\033[00m\]:; ";
