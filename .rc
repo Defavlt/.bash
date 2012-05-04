@@ -15,7 +15,7 @@ function :clear {
 	EXPECTED_ARGS=2
 	if [ $# -lt $EXPECTED_ARGS ];
 	then
-		ls -la --color=always;
+		ls -lah --color=always;
 	else
 		case "$2" in
 			-h | --help)
@@ -28,13 +28,24 @@ function :clear {
 
 ";
 				;;
+			-a | --append)
+				:clear $1 -s
+				if [ -z "$3" ];
+				then
+					printf "\n";
+					ls -lah --color=always -t | tail -n +2
+				else
+					printf "\n"
+					ls -lah $3 --color=always -t | tail -n +2
+				fi
+				;;
 			-q | --qoute)
-				cls;
+				:clear $1 -s
 				printf "\n";
 				fortune;
 				printf "\n";
 				;;
-			-n | --empy)
+			-n | --empty)
 				printf "\n";
 				;;
 			-c | --clear-display)
@@ -44,9 +55,17 @@ function :clear {
 			s | -s | --show-dir)
 				if [ -z "$3" ];
 				then
-					ls -la --color=always;
+					ls -lah --color=always;
 				else
-					ls -la $3 --color=always;
+					ls -lah $3 --color=always;
+				fi
+				;;
+			-st | -ts)
+				if [ -z "$3" ];
+				then
+					ls -lath --color=always;
+				else
+					ls -lath --color=always;
 				fi
 				;;
 			u | -u | --up | travelup)
@@ -63,6 +82,14 @@ function :clear {
 					:clear $1 -s;
 				fi
 				;;
+			-t | t | travelto)
+				if [ -z "$3" ];
+				then
+					:clear $1 $3;
+				else
+					:clear $1;
+				fi
+			;;
 			*)
 				if [ -z "$2" ];
 				then
@@ -96,6 +123,7 @@ function :update {
 				:update -p
 			;;
 			-p | --pull-repo)
+				cd ~/.bash
 				git remote add bash git@github.com:Defavlt/.bash.git
 				git pull bash master
 				ln -s ~/.bash/.rc ~/.bashrc
@@ -120,20 +148,97 @@ function wiki () {
 	fi
 }
 
+# Remove $2 and mv and link $1 to $2
+function pullcarpet() {
+	
+	if [ $# -eq 2 ];
+	then 
+
+		sudo rm $2
+		sudo mv $1 $2
+		sudo ln -s $2 $1
+
+	fi
+}
+
+function search () {
+	
+	if [ $# -gt 1 ];
+	then
+		case "$1" in
+			-n | --lines)
+				if [ $# -eq 3 ];
+				then
+					sudo awk "$2"' { count++ } END { printf count;printf "\n";}' $3
+				else
+					search;
+				fi
+			;;
+			*)
+				if [ $# -eq 2 ];
+				then
+					sudo awk -Fs "$1" $2;
+				elif [ $# -gt 2 ];
+				then
+					sudo awk -Fs $1 $2 $3;
+				else
+					search;
+				fi
+			;;
+		esac
+	else
+		printf "Usage: [-n] search file\n"
+	fi
+}
+
+function luser () {
+
+	if [ $# -lt 1 ];
+	then
+		users;
+	else
+		case "$1" in
+			-a | --active)
+				luser;
+			;;
+			-l | --all)
+				cat /etc/passwd | cut -d: -f1;
+			;;
+			-r | --real)
+				cat /etc/passwd | cut -d: -f5;
+			;;
+			-h | --help)
+				printf "Usage: luser [-a | -l | -r | -h] \n";
+			;;
+			*)
+				luser -h;
+			;;
+		esac
+	fi
+}
 
 #\---------------
 # Shortcuts
 #/---------------
 
-alias ls='ls -la --color=always'
+#Navigational
+alias ls='ls -lah --color=always'
 alias cls=':clear cls'
 alias ww='cls /var/www'
+alias expert='ww;cls apps.k2c.se_ssl/crm/expert/'
 
+#Other/Misc
 alias marcus='sudo chown marcus'
+alias lnh='ln --help | head --lines=1'
+alias pc='pullcarpet'
 
+#Loading of .rc-files
 alias charc='vi ~/.bashrc'
 alias sourc='source ~/.bashrc'
 
-#Fix some colours! \o/ 
-## (and :;!)
+#Settings
 export PS1="\[\033[01;33m\]\u@\\h:\[\033[01;34m\]\w\$\[\033[00m\]:; ";
+export HISTCONTROL=erasedups
+
+#Add other scripts
+source /etc/bash_completion.d/git;
