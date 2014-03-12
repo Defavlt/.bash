@@ -232,7 +232,7 @@ function luser () {
 
 	if [ $# -lt 1 ];
 	then
-		users;
+		users --help;
 	else
 		case "$1" in
 			-a | --active)
@@ -262,7 +262,6 @@ function luser () {
 alias ls='ls -lah --color=always'
 alias cls=':clear cls'
 alias ww='cls /var/www'
-alias expert='ww;cls apps.k2c.se_ssl/crm/expert/'
 
 #Other/Misc
 alias marcus='sudo chown marcus'
