@@ -2,6 +2,39 @@
 # Functions
 #/---------------
 
+# Scan local ports
+# Usage: scan 0 / scan 0,1,2 / scan 0-8
+scan() {
+  if [[ -z $1 || -z $2 ]]; then
+    echo "Usage: $0 <host> <port, ports, or port-range>"
+    return
+  fi
+
+  local host=$1
+  local ports=()
+  case $2 in
+    *-*)
+      IFS=- read start end <<< "$2"
+      for ((port=start; port <= end; port++)); do
+        ports+=($port)
+      done
+      ;;
+    *,*)
+      IFS=, read -ra ports <<< "$2"
+      ;;
+    *)
+      ports+=($2)
+      ;;
+  esac
+
+
+  for port in "${ports[@]}"; do
+   timeout 1 bash -c "echo >/dev/tcp/$host/$port" &&
+    printf "port $port is open\n" ||
+    printf "\n"
+  done
+}
+
 # Clear the screen with some information
 function :clear {
 
