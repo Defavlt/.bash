@@ -43,17 +43,21 @@ function scan {
 function :clear {
 
 	clear;
-	printf "\n+--------------------------------+\n| ";
+	printf "\n+--------------------------------+\n|";
 	pwd;
 	printf " : ";
 	date;
 	printf "+--------------------------------+\n\n";
 
 	EXPECTED_ARGS=2
-	if [ $# -lt $EXPECTED_ARGS ];
+	if [ $# -lt $EXPECTED_ARGS ] && [ $# -gt 0 ];
 	then
-		ls -lah --color=always;
-	else
+	    :clear $1 -s
+        printf "\n"
+    elif [ $# -lt 1 ];
+    then
+        printf "Usage: <name> -h\n"
+    else
 		case "$2" in
 			-h | --help)
 				printf "Usage: $1 [options] [URL] \nURL: The target path to show info on\nOptions:\n
@@ -93,16 +97,10 @@ function :clear {
 				if [ -z "$3" ];
 				then
 					ls -lah --color=always;
+                    jobs;
 				else
 					ls -lah $3 --color=always;
-				fi
-				;;
-			-st | -ts)
-				if [ -z "$3" ];
-				then
-					ls -lath --color=always;
-				else
-					ls -lath --color=always;
+                    jobs;
 				fi
 				;;
 			u | -u | --up | travelup)
@@ -131,11 +129,19 @@ function :clear {
 				if [ -z "$2" ];
 				then
 					:clear $1 -s;
-				else
-					cd $2;
-					:clear $1 -s;
-				fi
-				;;
+				elif [ -f $2 ];
+                then
+                    path=`dirname $2`
+                    cd $path
+                    
+                    $EDITOR $2 && :clear $1 -s;
+                elif [ -d $2 ];
+                then
+                    cd "$2";
+
+                    :clear $1 -s;
+                fi
+			;;
 		esac
 	fi
 
@@ -239,7 +245,7 @@ function luser () {
 				luser;
 			;;
 			-l | --all)
-				cat /etc/passwd | cut -d: -f1;
+	    		cat /etc/passwd | cut -d: -f1;
 			;;
 			-r | --real)
 				cat /etc/passwd | cut -d: -f5;
@@ -254,12 +260,25 @@ function luser () {
 	fi
 }
 
+function x () {
+    if [ $# -lt 1 ];
+    then
+        ./
+    else
+        ./$1
+    fi
+}
+
 #\---------------
 # Shortcuts
 #/---------------
 
+#Required by :clear
+EDITOR=/usr/bin/vi
+
 #Navigational
-alias ls='ls -lah --color=always'
+# WTF DUDE
+#alias ls='ls -lah --color=always'
 alias cls=':clear cls'
 alias ww='cls /var/www'
 
@@ -267,6 +286,10 @@ alias ww='cls /var/www'
 alias marcus='sudo chown marcus'
 alias lnh='ln --help | head --lines=1'
 alias pc='pullcarpet'
+alias x='./$1'
+alias suspend='sudo pm-suspend'
+alias restart='sudo shutdown -r now'
+alias shutdown='sudo shutdown -h -P now'
 
 #Loading of .rc-files
 alias charc='vi ~/.bashrc'
@@ -276,5 +299,15 @@ alias sourc='source ~/.bashrc'
 export PS1="\[\033[01;33m\]\u@\\h:\[\033[01;34m\]\w\$\[\033[00m\]:; ";
 export HISTCONTROL=erasedups
 
+#Shortcuts..
+alias 1='fg 1 2&> /dev/null'
+alias 2='fg 2 2&> /dev/null'
+alias 3='fg 3 2&> /dev/null'
+alias 4='fg 4 2&> /dev/null'
+alias 5='fg 5 2&> /dev/null'
+
 #Add other scripts
 source /etc/bash_completion.d/git;
+
+# Bash auto completion
+eval "$(grunt --completion=bash)"
