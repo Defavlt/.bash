@@ -312,6 +312,3 @@ bash_completion=/etc/bash_completion.d/git/
 if [ -f $bash_completion ];
 then source /etc/bash_completion.d/git;
 fi
-
-# Bash auto completion
-eval "$(grunt --completion=bash)"
