@@ -128,18 +128,18 @@ function :clear {
 			*)
 				if [ -z "$2" ];
 				then
-					:clear $1 -s;
+					:clear $1 -s
 				elif [ -f $2 ];
                 then
                     path=`dirname $2`
                     cd $path
                     
-                    $EDITOR $2 && :clear $1 -s;
+                    $EDITOR $2 && :clear $1 -s
                 elif [ -d $2 ];
                 then
                     cd "$2";
 
-                    :clear $1 -s;
+                    :clear $1 -s
                 fi
 			;;
 		esac
@@ -307,7 +307,11 @@ alias 4='fg 4 2&> /dev/null'
 alias 5='fg 5 2&> /dev/null'
 
 #Add other scripts
-source /etc/bash_completion.d/git;
+bash_completion=/etc/bash_completion.d/git/
+
+if [ -f $bash_completion ];
+then source /etc/bash_completion.d/git;
+fi
 
 # Bash auto completion
 eval "$(grunt --completion=bash)"
