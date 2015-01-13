@@ -1,129 +1,28 @@
-#\---------------
-# Functions
-#/---------------
+shopt -s extglob
 
-# Remove $2 and mv and link $1 to $2
-function pullcarpet() {
-	
-	if [ $# -eq 2 ];
-	then 
 
-		sudo rm $2
-		sudo mv $1 $2
-		sudo ln -s $2 $1
+# Resolve the current script path,
+# See $DIR
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; 
+do # resolve $SOURCE until the file is no longer a symlink
 
-	fi
-}
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
 
-function search () {
-	
-	if [ $# -gt 1 ];
-	then
-		case "$1" in
-			-n | --lines)
-				if [ $# -eq 3 ];
-				then
-					sudo awk "$2"' { count++ } END { printf count;printf "\n";}' $3
-				else
-					search;
-				fi
-			;;
-			*)
-				if [ $# -eq 2 ];
-				then
-					sudo awk -Fs "$1" $2;
-				elif [ $# -gt 2 ];
-				then
-					sudo awk -Fs $1 $2 $3;
-				else
-					search;
-				fi
-			;;
-		esac
-	else
-		printf "Usage: [-n] search file\n"
-	fi
-}
+  # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" 
+  # Fix vi's broken syntax highlighting */
 
-function luser () {
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-	if [ $# -lt 1 ];
-	then
-		users --help;
-	else
-		case "$1" in
-			-a | --active)
-				luser;
-			;;
-			-l | --all)
-	    		cat /etc/passwd | cut -d: -f1;
-			;;
-			-r | --real)
-				cat /etc/passwd | cut -d: -f5;
-			;;
-			-h | --help)
-				printf "Usage: luser [-a | -l | -r | -h] \n";
-			;;
-			*)
-				luser -h;
-			;;
-		esac
-	fi
-}
-
-function x () {
-    if [ $# -lt 1 ];
-    then
-        ./
-    else
-        ./$1
-    fi
-}
-
-#\---------------
-# Shortcuts
-#/---------------
-
-#Required by :clear
-EDITOR=/usr/bin/vi
-
-#Navigational
-# WTF DUDE
-#alias ls='ls -lah --color=always'
-alias cls=':clear cls'
-alias ww='cls /var/www'
-
-#Other/Misc
-alias marcus='sudo chown marcus'
-alias lnh='ln --help | head --lines=1'
-alias pc='pullcarpet'
-alias x='./$1'
-alias suspend='sudo pm-suspend'
-alias restart='sudo shutdown -r now'
-alias shutdown='sudo shutdown -h -P now'
-
-#Loading of .rc-files
-alias charc='vi ~/.bashrc'
-alias sourc='source ~/.bashrc'
-
-#Settings
-export PS1="\[\033[01;33m\]\u@\\h:\[\033[01;34m\]\w\$\[\033[00m\]:; ";
-export HISTCONTROL=erasedups
-
-#Shortcuts..
-alias 1='fg 1 2&> /dev/null'
-alias 2='fg 2 2&> /dev/null'
-alias 3='fg 3 2&> /dev/null'
-alias 4='fg 4 2&> /dev/null'
-alias 5='fg 5 2&> /dev/null'
-
-#Add other scripts
-bash_completion=/etc/bash_completion.d/git
-scripts=(/etc/bash_completion.d/git ~/src/bash/exports.d/*)
+scripts=($DIR/.rc.d/*.sh /etc/bash_completion.d/git ~/src/bash/exports.d/*) # Fix vi's broken syntax highlighting */
 
 for script in "${scripts[@]}"
 do
     if [ -f $script ];
-        then source $script;
+        # Since this is run at console start up, disable errors
+        then source $script #2&>/dev/null;
     fi
 done
