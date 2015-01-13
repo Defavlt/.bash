@@ -307,8 +307,12 @@ alias 4='fg 4 2&> /dev/null'
 alias 5='fg 5 2&> /dev/null'
 
 #Add other scripts
-bash_completion=/etc/bash_completion.d/git/
+bash_completion=/etc/bash_completion.d/git
+scripts=(/etc/bash_completion.d/git ~/src/bash/exports.d/*)
 
-if [ -f $bash_completion ];
-then source /etc/bash_completion.d/git;
-fi
+for script in "${scripts[@]}"
+do
+    if [ -f $script ];
+        then source $script;
+    fi
+done
