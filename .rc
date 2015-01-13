@@ -2,50 +2,6 @@
 # Functions
 #/---------------
 
-# Update this source file with the most recent at github
-# Not yet done. Do not use yet.
-function :update {
-
-	if [ $# -gt 0 ];
-	then
-		case "$1" in
-			-i | --init-new)
-				cd ~
-				rm -Rf .bash
-				:update -a
-			;;
-			-a | --create-dir)
-				mkdir ~/.bash
-				cd ~/.bash
-				git init
-				:update -p
-			;;
-			-p | --pull-repo)
-				cd ~/.bash
-				git remote add bash git@github.com:Defavlt/.bash.git
-				git pull bash master
-				ln -s ~/.bash/.rc ~/.bashrc
-			;;
-			-h | --help | *)
-				printf "Usage: :update (-i | -a)\n\t-i, --init-new\n\t\tRemoves the already existing ~/.bash-directory, adds a new ~/.bash-directory and inits and pulls the git repo.\n\t-a, --create-dir\n\t\tCreates a new ~/.bash-directory and inits and pulls the git repo.\n\t-p, --pull-repo\n\\tPulls the git repo and creates a symlink to ~/.bashrc.\n"
-			;;
-		esac
-	else
-		printf "Wrong argument/s and/or amount of arguments."
-		printf "\nUsage: :update -h\n";
-	fi
-
-}
-
-function wiki () {
-	if [ $# -gt 0 ];
-	then
-		dig +short txt $1.wp.dg.cx
-	else
-		printf "\nUsage: wiki SUBJECT\n";
-	fi
-}
-
 # Remove $2 and mv and link $1 to $2
 function pullcarpet() {
 	
