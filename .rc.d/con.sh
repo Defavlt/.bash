@@ -1,5 +1,5 @@
 # Clear the screen with some information
-function :clear {
+function con {
 
 	clear;
 	printf "\n+--------------------------------+\n|";
@@ -11,7 +11,7 @@ function :clear {
 	EXPECTED_ARGS=2
 	if [ $# -lt $EXPECTED_ARGS ] && [ $# -gt 0 ];
 	then
-	    :clear $1 -s
+	    con $1 -s
         printf "\n"
     elif [ $# -lt 1 ];
     then
@@ -29,7 +29,7 @@ function :clear {
 ";
 				;;
 			-a | --append)
-				:clear $1 -s
+				con $1 -s
 				if [ -z "$3" ];
 				then
 					printf "\n";
@@ -40,7 +40,7 @@ function :clear {
 				fi
 				;;
 			-q | --qoute)
-				:clear $1 -s
+				con $1 -s
 				printf "\n";
 				fortune;
 				printf "\n";
@@ -66,39 +66,39 @@ function :clear {
 				if [ -z "$3" ];
 				then
 					cd ..;
-					:clear $1 -s;
+					con $1 -s;
 				else
 					for (( i=0; i<$3; i++ ))
 	 				 do
 						cd ..;
 					 done
 
-					:clear $1 -s;
+					con $1 -s;
 				fi
 				;;
 			-t | t | travelto)
 				if [ -z "$3" ];
 				then
-					:clear $1 $3;
+					con $1 $3;
 				else
-					:clear $1;
+					con $1;
 				fi
 			;;
 			*)
 				if [ -z "$2" ];
 				then
-					:clear $1 -s
+					con $1 -s
 				elif [ -f $2 ];
                 then
                     path=`dirname $2`
                     cd $path
                     
-                    $EDITOR $2 && :clear $1 -s
+                    $EDITOR $2 && con $1 -s
                 elif [ -d $2 ];
                 then
                     cd "$2";
 
-                    :clear $1 -s
+                    con $1 -s
                 fi
 			;;
 		esac
@@ -106,4 +106,5 @@ function :clear {
 
 }
 
-alias cls=':clear cls'
+EDITOR=/usr/bin/vi
+alias cls='con cls'
