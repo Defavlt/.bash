@@ -23,6 +23,6 @@ for script in "${scripts[@]}"
 do
     if [ -f $script ];
         # Since this is run at console start up, disable errors
-        then source $script #2&>/dev/null;
+        then source $script 2&>/dev/null;
     fi
 done
