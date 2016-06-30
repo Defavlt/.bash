@@ -4,6 +4,7 @@ alias pc='pullcarpet'
 alias x='./$1'
 alias suspend='sudo pm-suspend'
 alias restart='sudo shutdown -r now'
+alias reboot='restart'
 alias shutdown='sudo shutdown -h -P now'
 
 #Loading of .rc-files
